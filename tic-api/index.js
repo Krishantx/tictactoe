@@ -27,9 +27,19 @@ io.on("connection", (socket) => {
     });
 
     socket.on("join_room", (room) => {
-        console.log("Join room triggered");
-        socket.join(room);
-        socket.to(room).emit("joined", socket.id);
+        const rooms = io.sockets.adapter.rooms;
+        if (rooms.has(room)) {
+            const roomSize = rooms.get(room)?.size;
+            if (roomSize > 2) { socket.emit("full_room"); }
+            console.log("Join room triggered");
+            socket.join(room);
+            
+            io.in(room).emit("joined", room, roomSize);
+        } else {
+            console.log("Room does not exist");
+            socket.emit("room_error");
+        }
+        
     })
 })
 
