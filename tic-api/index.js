@@ -18,12 +18,19 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
     console.log("New user connected");
 
-    socket.on("create_room", (socket) => {
+    socket.on("create_room", () => {
         console.log("Create Room triggered");
         var roomCode = randomString.generate(5);
         console.log(roomCode);
         socket.join(roomCode);
+        socket.emit("room_created", roomCode);
     });
+
+    socket.on("join_room", (room) => {
+        console.log("Join room triggered");
+        socket.join(room);
+        socket.to(room).emit("joined", socket.id);
+    })
 })
 
 
