@@ -20,6 +20,9 @@ io.on("connection", (socket) => {
 
     socket.on("create_room", (socket) => {
         console.log("Create Room triggered");
+        var roomCode = randomString.generate(5);
+        console.log(roomCode);
+        socket.join(roomCode);
     });
 })
 
