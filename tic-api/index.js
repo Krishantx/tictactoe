@@ -17,26 +17,44 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
     console.log("New user connected");
-
     socket.on("create_room", () => {
-        console.log("Create Room triggered");
         var roomCode = randomString.generate(5);
-        console.log(roomCode);
         socket.join(roomCode);
         socket.emit("room_created", roomCode);
     });
+    socket.on("ready", ()=> {
+        console.log("User is ready");
+    })
+    socket.on("start_game", (room) => {
+        io.in(room).emit("start");
+        function getRandomSocketFromRoom(io, room) {
+            const clients = Array.from(io.sockets.adapter.rooms.get(room) || []);    
+            if (clients.length === 0) return null; // No sockets in the room
+            const randomIndex = Math.floor(Math.random() * clients.length);
+            return [clients[randomIndex], clients[!randomIndex]];
+          }
+          const randomSocketId = getRandomSocketFromRoom(io, room);
+    if (randomSocketId) {
+      io.to(randomSocketId[0]).emit("x");
+      io.to(randomSocketId[1]).emit('y');
 
+      console.log(`Selected socket: ${randomSocketId}`);
+
+    } else {
+      console.log("No users in the room.");
+    }
+    })
     socket.on("join_room", (room) => {
         const rooms = io.sockets.adapter.rooms;
         if (rooms.has(room)) {
             const roomSize = rooms.get(room)?.size;
-            if (roomSize > 2) { socket.emit("full_room"); }
-            console.log("Join room triggered");
-            socket.join(room);
-            
-            io.in(room).emit("joined", room, roomSize);
+            console.log(roomSize+1);
+            if (roomSize+1 > 2) { socket.emit("full_room"); }
+            else {
+                socket.join(room);
+                io.in(room).emit("joined", room, roomSize+1);
+            }
         } else {
-            console.log("Room does not exist");
             socket.emit("room_error");
         }
         
