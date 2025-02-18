@@ -31,12 +31,11 @@ io.on("connection", (socket) => {
             const clients = Array.from(io.sockets.adapter.rooms.get(room) || []);    
             if (clients.length === 0) return null; // No sockets in the room
             const randomIndex = Math.floor(Math.random() * clients.length);
-            return [clients[randomIndex], clients[!randomIndex]];
+            return clients[randomIndex];
           }
           const randomSocketId = getRandomSocketFromRoom(io, room);
     if (randomSocketId) {
-      io.to(randomSocketId[0]).emit("x");
-      io.to(randomSocketId[1]).emit('y');
+      io.to(randomSocketId).emit("x");
 
       console.log(`Selected socket: ${randomSocketId}`);
 

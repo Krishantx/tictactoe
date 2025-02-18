@@ -1,0 +1,18 @@
+.create-room-button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.create-room-button:hover {
+    background-color: #0056b3;
+}
+
+.create-room-button:active {
+    transform: scale(0.95);
+}
