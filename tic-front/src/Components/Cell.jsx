@@ -2,7 +2,7 @@ function Cell(props) {
     function turn() {
         
     }
-    return <div onClick={turn} className="cell" id={"c" + props.i}></div>
+    return <div onClick={()=> {props.move(props.i);}} className="cell" id={"c" + props.i}>{props.state}</div>
 }
 
 
