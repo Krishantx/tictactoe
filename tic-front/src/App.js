@@ -5,11 +5,12 @@ import Game from "./Components/Game";
 import { useState } from "react";
 const socket = io("http://localhost:2828/");
 function App() {
-
+  const [xo, setXO] = useState(['', '', '', '', '', '', '', '', '']);
   const [roomCode, setRoomCode] = useState(null);
   const [roomSize, setRoomSize] = useState(0);
   const [er, setEr] = useState(false);
   const [fullRoom, setFullRoom] = useState(false);
+  const [turn, setTurn] = useState('x');
 
   const AppState = {
     NotInRoom : "NOT_IN_ROOM",
@@ -18,6 +19,11 @@ function App() {
   };
 
   const [appState, setAppState] = useState("NOT_IN_ROOM");
+  function send(newArr, t) {
+    console.log(`Sending data: ${newArr} and ${t}`);
+    //console.log(newArr);
+    socket.emit('change_state', newArr, t, roomCode);
+  }
   function start() {
     socket.emit('start_game', roomCode);
   }
@@ -33,12 +39,11 @@ function App() {
       socket.emit("ready");
     }
   }
-socket.on('x', ()=> {
-  console.log("i am x");
-  socket.emit("y", roomCode, socket.id);
-})
-socket.on("y", () => {
-  console.log("i am Y");
+socket.on('changed_state', (newXO, t) => {
+  console.log(`recovered data ${newXO} & ${t}`);
+  //console.log(newXO);
+  setXO(newXO);
+  setTurn(t)
 })
 socket.on("joined", (room, roomS) => {
   console.log("Joined the room");
@@ -74,7 +79,7 @@ socket.on("room_created", (room) => {
 
   switch (appState) {
     case AppState.InGame:
-      return (<Game />)
+      return (<Game xo = {xo} setXO = {setXO} send = {send} turn = {turn} setTurn = {setTurn}/>)
       break;
 
     case AppState.NotInRoom:

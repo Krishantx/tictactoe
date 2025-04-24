@@ -1,8 +1,13 @@
 function Cell(props) {
-    function turn() {
-        
+    if (props.i === 9) {
+        console.log(props.state);
     }
-    return <div onClick={()=> {props.move(props.i);}} className="cell" id={"c" + props.i}>{props.state}</div>
+    if (props.state === '') {
+        return <div onClick={()=> {props.move(props.i);}} className="cell" id={"c" + props.i}>{props.state}</div>
+    } else {
+        return <div  className="cell" id={"c" + props.i}>{props.state}</div>
+    }
+    
 }
 
 
