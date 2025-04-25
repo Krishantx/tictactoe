@@ -25,7 +25,13 @@ io.on("connection", (socket) => {
     socket.on("ready", ()=> {
         console.log("User is ready");
     })
-
+    socket.on('reset_board', (room) => {
+        console.log('reset');
+        io.to(room).emit('resetted');
+    })
+    socket.on('won', (winner, room) => {
+        io.to(room).emit("lost", winner);
+    })
     socket.on('change_state', (xo, turn, room) => {
         console.log(xo);
         io.to(room).emit("changed_state", xo, turn);
