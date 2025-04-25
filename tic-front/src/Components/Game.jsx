@@ -9,11 +9,41 @@ function Game(props) {
 
     useEffect(()=> {
         console.log("Updated XO:", props.xo);
-        if (justChanged) {
+        if (justChanged) {  
         props.send();
         setJustChanged(false);
+        if (checkWin()) {
+            if (props.turn !== props.you) {
+                console.log("You won!");
+                props.win();
+            }
+        }
         }
     }, [props.xo]);
+    //implement win function and this project is done
+    function checkWin() {
+        //Check Horizontal lines;
+        for (var i = 0; i <= 5; i+=3) {
+            if (props.xo[i] !== '' && props.xo[i] === props.xo[i+1] && props.xo[i] === props.xo[i+2]) {
+                return true;
+            }
+        }
+        //Check Verrtical Lines;
+        for (var i = 0; i < 3; i++) {
+            if (props.xo[i] !== '' && props.xo[i] === props.xo[i+3] && props.xo[i] === props.xo[i+6]) {
+                return true;
+            }
+        }
+        //Check diagonal Lines;
+        if (props.xo[0] !== '' && props.xo[0] === props.xo[4] && props.xo[0] === props.xo[8]) {
+            return true;
+        }
+
+        if (props.xo[2] !== '' && props.xo[2] === props.xo[4] && props.xo[2] === props.xo[6]) {
+            return true;
+        }
+        return false;
+    }
     function move(i) {
         console.log(`${i} was clicked`);
         props.setXO(prevArr => {
@@ -26,17 +56,19 @@ function Game(props) {
             t === 'x' ? 'o' : 'x'
         );
         setJustChanged(true);
+        
         console.log(props.xo);
         
     }
     return (
         <div className="game-container">
             <h1 className="title">Tic Tac Toe</h1>
+            {props.winner ? `${props.winner} won` : null}
             <h2 className="subtitle">You are : {props.you}</h2>
 
             <div className="board">
                 {a.map((i) => (
-                    <Cell key={i} i={i} turn = {props.turn} you = {props.you} move={move} state={props.xo[i]}/>
+                    <Cell key={i} i={i} winner = {props.winner} turn = {props.turn} you = {props.you} move={move} state={props.xo[i]}/>
                 ))}
             </div>
 
@@ -45,7 +77,8 @@ function Game(props) {
             
             {/* Reset button restarts the game */}
             <button className="reset-button" onClick={() => {
-                props.setXO(['', '', '', '', '', '', '', '', ''])}}>Reset Game</button>
+                props.resetBoard();
+                }}>Reset Game</button>
         </div>
     );
 }

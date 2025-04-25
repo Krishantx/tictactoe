@@ -5,7 +5,7 @@ import http from "http";
 
 const app = express();
 let server = http.createServer(app);
-const port = 2828;
+const port = process.env.PORT || 4000 
 const io = new Server(server, {
     cors: {
       origin: "https://kaleidoscopic-panda-47aad8.netlify.app/",  // Allow requests from the frontend

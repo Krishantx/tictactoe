@@ -3,7 +3,7 @@ import InRoom from "./Components/InRoom";
 import NotInRoom from "./Components/NotInRoom";
 import Game from "./Components/Game";
 import { useState } from "react";
-const socket = io("http://localhost:2828/");
+const socket = io("https://tictactoe-qz1b.onrender.com/");
 function App() {
   const [xo, setXO] = useState(['', '', '', '', '', '', '', '', '']);
   const [roomCode, setRoomCode] = useState(null);
@@ -12,7 +12,7 @@ function App() {
   const [fullRoom, setFullRoom] = useState(false);
   const [turn, setTurn] = useState('x');
   const [you, setYou] = useState();
-
+  const [winner, setWinner] = useState();
   const AppState = {
     NotInRoom : "NOT_IN_ROOM",
     InRoom : "IN_ROOM",
@@ -22,6 +22,13 @@ function App() {
   const [appState, setAppState] = useState("NOT_IN_ROOM");
 
 
+function resetBoard() {
+  socket.emit('reset_board', roomCode) ;
+  
+}
+  function win() {
+    socket.emit(`won`, (turn === 'x' ? 'o' : 'x'), roomCode); 
+  }
   function send() {
     //console.log(`Sending data: ${xo} and ${turn}`);
     //console.log(newArr);
@@ -42,7 +49,13 @@ function App() {
       socket.emit("ready");
     }
   }
-
+socket.on('resetted', () => {
+  console.log("reset");
+    setXO(['', '', '', '', '', '', '', '', '']);
+  })
+socket.on("lost", (win) => {
+  setWinner(win);
+})
 
 socket.on('changed_state', (newXO, t) => {
   console.log(`recovered data ${newXO} & ${t}`);
@@ -93,7 +106,7 @@ socket.on("room_created", (room) => {
 
   switch (appState) {
     case AppState.InGame:
-      return (<Game you = {you} xo = {xo} setXO = {setXO} send = {send} turn = {turn} setTurn = {setTurn}/>)
+      return (<Game resetBoard = {resetBoard} win = {win} winner = {winner} you = {you} xo = {xo} setXO = {setXO} send = {send} turn = {turn} setTurn = {setTurn}/>)
       break;
 
     case AppState.NotInRoom:
