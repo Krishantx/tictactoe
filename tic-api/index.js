@@ -25,23 +25,24 @@ io.on("connection", (socket) => {
     socket.on("ready", ()=> {
         console.log("User is ready");
     })
-    socket.on("start_game", (room) => {
+
+    socket.on('change_state', (xo, turn, room) => {
+        console.log(xo);
+        io.to(room).emit("changed_state", xo, turn);
+    })
+    socket.on("start_game", async (room) => {
         io.in(room).emit("start");
-        function getRandomSocketFromRoom(io, room) {
-            const clients = Array.from(io.sockets.adapter.rooms.get(room) || []);    
+        function getClientsInRandomOrder() {
+            const clients = Array.from(io.sockets.adapter.rooms.get(room) || []); 
             if (clients.length === 0) return null; // No sockets in the room
             const randomIndex = Math.floor(Math.random() * clients.length);
-            return clients[randomIndex];
-          }
-          const randomSocketId = getRandomSocketFromRoom(io, room);
-    if (randomSocketId) {
-      io.to(randomSocketId).emit("x");
+            console.log(`Random index is ${randomIndex}`);
+            return [clients[randomIndex], clients[randomIndex === 0 ? 1 : 0]];
+        }
 
-      console.log(`Selected socket: ${randomSocketId}`);
-
-    } else {
-      console.log("No users in the room.");
-    }
+          const randomSocketId = await getClientsInRandomOrder(io, room);
+          io.to(randomSocketId[0]).emit('x');
+          io.to(randomSocketId[1]).emit('o');
     })
     socket.on("join_room", (room) => {
         const rooms = io.sockets.adapter.rooms;

@@ -11,6 +11,7 @@ function App() {
   const [er, setEr] = useState(false);
   const [fullRoom, setFullRoom] = useState(false);
   const [turn, setTurn] = useState('x');
+  const [you, setYou] = useState();
 
   const AppState = {
     NotInRoom : "NOT_IN_ROOM",
@@ -19,10 +20,12 @@ function App() {
   };
 
   const [appState, setAppState] = useState("NOT_IN_ROOM");
-  function send(newArr, t) {
-    console.log(`Sending data: ${newArr} and ${t}`);
+
+
+  function send() {
+    //console.log(`Sending data: ${xo} and ${turn}`);
     //console.log(newArr);
-    socket.emit('change_state', newArr, t, roomCode);
+    socket.emit('change_state', xo, turn, roomCode);
   }
   function start() {
     socket.emit('start_game', roomCode);
@@ -39,11 +42,16 @@ function App() {
       socket.emit("ready");
     }
   }
+
+
 socket.on('changed_state', (newXO, t) => {
   console.log(`recovered data ${newXO} & ${t}`);
   //console.log(newXO);
-  setXO(newXO);
-  setTurn(t)
+  if (newXO !== xo) {
+    setXO(newXO);
+    setTurn(t);
+  }
+  
 })
 socket.on("joined", (room, roomS) => {
   console.log("Joined the room");
@@ -54,8 +62,14 @@ socket.on("joined", (room, roomS) => {
 socket.on("start", () => {
   setAppState("IN_GAME");
 })
-
-
+socket.on('o', () => {
+  console.log(`You are o`);
+  setYou('o');
+})
+socket.on('x', () => {
+  console.log(`You are x`);
+  setYou('x');
+})
 socket.on("room_error", ()=> {
   setEr(true);
 })
@@ -79,7 +93,7 @@ socket.on("room_created", (room) => {
 
   switch (appState) {
     case AppState.InGame:
-      return (<Game xo = {xo} setXO = {setXO} send = {send} turn = {turn} setTurn = {setTurn}/>)
+      return (<Game you = {you} xo = {xo} setXO = {setXO} send = {send} turn = {turn} setTurn = {setTurn}/>)
       break;
 
     case AppState.NotInRoom:
