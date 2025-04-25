@@ -8,7 +8,7 @@ let server = http.createServer(app);
 const port = 2828;
 const io = new Server(server, {
     cors: {
-      origin: "http://localhost:3000",  // Allow requests from the frontend
+      origin: "https://kaleidoscopic-panda-47aad8.netlify.app/",  // Allow requests from the frontend
       methods: ["GET", "POST"],         // Allowed HTTP methods
       allowedHeaders: ["my-custom-header"],
       credentials: true
